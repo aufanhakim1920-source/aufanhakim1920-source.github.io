@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aufan Rachmad · Aufan Studio</title>
+<meta name="description" content="Aufan Rachmad, Aufan Studio, Melbourne. Websites, systems and short motion films, built by hand. Data Science @ UniMelb.">
+<meta name="theme-color" content="#0E0C19">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aufan Rachmad · Aufan Studio">
+<meta property="og:description" content="Websites, systems and short motion films, built by hand. Data Science @ UniMelb.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' rx='40' fill='%230E0C19'/%3E%3Cpath d='M47 150 100 58l53 92' fill='none' stroke='%23EEEBF8' stroke-width='15' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M30 126 170 102' stroke='%238C6BFF' stroke-width='16' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Space+Grotesk:wght@300;400;500&amp;display=swap">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+/* ── B · the card itself ─────────────────────────────────────────────────
+   One object: an ID-1 card (85.6 x 54 mm). Tapping it seats it on the reader,
+   lights its contactless arcs, and deals its six records out from underneath.
+   Without JS, or with reduced motion, the six records are simply there.      */
+
+:root{
+  /* ground: near-black pulled toward violet, never neutral */
+  --ground:#0E0C19;
+  --slab:#171429;        /* a dealt record */
+  --slab-hi:#1D1933;     /* record, hovered */
+  --slab-down:#120F22;   /* record, pressed */
+  --ink:#EEEBF8;
+  --mute:#A6A1C3;
+  --volt:#8C6BFF;        /* THE one signal */
+  /* card material */
+  --card-hi:#28233F;
+  --card-lo:#17142A;
+  --card-ink:#DCD8EE;
+  --card-mute:#ABA6C7;
+  --edge-hi:#55507A;
+  --edge-lo:#221E36;
+
+  /* radius tiers: the object is round, the page is square */
+  --r-page:0;
+
+  /* motion: one state curve, one travel curve, one spring (standard table values) */
+  --e-state:cubic-bezier(.4,0,.2,1);    /* Material standard */
+  --e-travel:cubic-bezier(.22,1,.36,1); /* easeOutQuint */
+  --e-spring:cubic-bezier(.34,1.56,.64,1); /* easeOutBack */
+  --t-state:.15s;
+  --t-travel:.5s;
+  --deal:240ms;  /* card squares up first, then the records leave */
+  --step:70ms;
+
+  --sans:"Space Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--ground);-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100vh;min-height:100svh;color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  /* the invisible gradient: signal bled in as light, under 8% */
+  background:
+    radial-gradient(90% 60% at 82% -8%, rgba(140,107,255,.075), transparent 62%),
+    radial-gradient(140% 90% at 50% 120%, rgba(0,0,0,.55), transparent 60%),
+    var(--ground);
+}
+
+/* texture layer: fixed grain, one div */
+.grain{
+  position:fixed;inset:0;z-index:20;pointer-events:none;opacity:.075;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.6 -.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+}
+
+.page{
+  padding:max(22px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(48px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));
+  max-width:440px;margin:0 auto;
+}
+
+/* ── the quiet page ── */
+.meta{
+  margin:0;display:flex;justify-content:space-between;gap:12px;
+  font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);
+}
+h1{
+  margin:22px 0 0;font:300 44px/1 var(--sans);letter-spacing:-.03em;color:var(--ink);
+}
+.bio{margin:14px 0 0;max-width:33ch;font:400 15.5px/1.5 var(--sans);color:var(--mute)}
+
+.stage{position:relative;margin-top:40px}
+/* the reader's field: lights only once the card is read */
+.stage::before{
+  content:"";position:absolute;z-index:0;left:0;right:0;top:-8%;height:70%;pointer-events:none;
+  background:radial-gradient(closest-side, rgba(140,107,255,.20), transparent);
+  opacity:0;transition:opacity var(--t-state) var(--e-state);
+}
+.is-read .stage::before{opacity:1}
+
+/* ── THE CARD ─────────────────────────────────────────────────────────── */
+.card{
+  position:relative;z-index:2;display:block;width:100%;max-width:360px;margin:0 auto;
+  aspect-ratio:85.6/54;container-type:inline-size;perspective:950px;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;outline:none;
+  user-select:none;-webkit-user-select:none;
+}
+.js .card{cursor:pointer}
+/* ISO/IEC 7810 ID-1 corner is 3.18 mm; a chip module about 1 mm */
+.card *{--r-card:calc(100cqw * 3.18 / 85.6);--r-chip:calc(100cqw * 1 / 85.6)}
+
+.shadow{
+  position:absolute;left:9%;right:9%;top:34%;bottom:-4%;border-radius:50%;
+  background:#030207;filter:blur(20px);opacity:.9;
+  transform:translate(4%,16px) scale(.92);
+  transition:transform var(--t-travel) var(--e-travel);
+}
+.tilt,.pose,.press,.body{position:absolute;inset:0;transform-style:preserve-3d}
+/* pointer tilt (JS) */
+.tilt{transform:rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg));transition:transform var(--t-state) var(--e-state)}
+/* unread = held at an angle; read = squared up on the reader */
+.pose{transform:rotateX(18deg) rotateY(-17deg) rotateZ(4deg);transition:transform var(--t-travel) var(--e-travel)}
+.is-read .pose{transform:none}
+/* the tap itself */
+.press{transition:transform .32s var(--e-spring)}
+.down .press{transform:translateZ(-38px);transition:transform var(--t-state) var(--e-state)}
+.down .shadow{transform:translate(0,6px) scale(.86)}
+.is-read .shadow{transform:translate(0,10px) scale(.98)}
+
+/* thickness: three layers behind the face, lit from above */
+.edge{position:absolute;inset:0;border-radius:var(--r-card);background:linear-gradient(180deg,var(--edge-hi),var(--edge-lo) 60%)}
+.e1{transform:translateZ(-1.3px)}
+.e2{transform:translateZ(-2.6px)}
+.e3{transform:translateZ(-3.9px);background:var(--edge-lo)}
+
+.face{
+  position:absolute;inset:0;border-radius:var(--r-card);overflow:hidden;
+  background:
+    radial-gradient(circle at var(--mx,26%) var(--my,14%), rgba(255,255,255,.11), transparent 46%),
+    repeating-linear-gradient(98deg, rgba(255,255,255,.02) 0 1px, transparent 1px 3px),
+    linear-gradient(152deg, var(--card-hi), var(--card-lo) 72%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.17),
+    inset 1px 0 0 rgba(255,255,255,.05),
+    inset 0 -1px 0 rgba(0,0,0,.55);
+}
+.js .card:focus-visible .face{outline:2px solid var(--volt);outline-offset:5px}
+
+.issuer{
+  position:absolute;left:7cqw;top:7cqw;font:500 3.3cqw/1 var(--sans);letter-spacing:.3em;color:var(--card-mute);
+}
+/* the chip: six contact pads, one per record */
+.chip{
+  position:absolute;left:9.6cqw;top:21.4cqw;width:13.6cqw;height:10.4cqw;border-radius:var(--r-chip);overflow:hidden;
+  display:grid;grid-template-columns:1fr .78fr 1fr;grid-template-rows:repeat(3,1fr);gap:.36cqw;padding:.36cqw;
+  grid-template-areas:"p0 c p3" "p1 c p4" "p2 c p5";
+  background:#4D4862;
+  box-shadow:0 .25cqw .5cqw rgba(0,0,0,.45), inset 0 0 0 .18cqw rgba(0,0,0,.25);
+}
+.pad{position:relative;background:linear-gradient(140deg,#DCD8EA,#9D99B2 52%,#CFCBDD)}
+.pad::after{content:"";position:absolute;inset:0;background:var(--volt);opacity:0;transition:opacity var(--t-state) var(--e-state)}
+.pad.on::after{opacity:1}
+.pc{grid-area:c;background:linear-gradient(160deg,#C9C5D8,#8E8AA3)}
+.anim .pad::after{animation:flash .44s var(--e-state) calc(var(--deal) + var(--i) * var(--step)) both}
+@keyframes flash{0%,100%{opacity:0}28%{opacity:1}}
+
+/* contactless arcs: dim until read, then lit outward in order */
+.arcs{position:absolute;left:26.4cqw;top:21.2cqw;width:8.6cqw;height:10.8cqw;overflow:visible}
+.arcs path,.arcs circle{transition:stroke var(--t-state) var(--e-state) var(--d),fill var(--t-state) var(--e-state) var(--d)}
+.arcs path{fill:none;stroke:rgba(220,216,238,.5);stroke-width:1.9;stroke-linecap:round}
+.arcs circle{fill:rgba(220,216,238,.5)}
+.is-read .arcs path{stroke:var(--volt)}
+.is-read .arcs circle{fill:var(--volt)}
+.ping .arcs path{animation:ping .3s var(--e-state) var(--d) both}
+@keyframes ping{0%{stroke:var(--ink)}100%{stroke:var(--volt)}}
+
+/* the record the card is pointing at: its address, printed where a card number would be */
+.url{
+  position:absolute;left:7cqw;right:7cqw;top:41.5cqw;
+  font:400 3.05cqw/1.2 var(--mono);letter-spacing:.02em;color:var(--card-mute);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.url.tick{animation:tick var(--t-state) var(--e-state)}
+@keyframes tick{from{transform:translateY(.9cqw)}}
+.holder{
+  position:absolute;left:7cqw;bottom:7.2cqw;
+  font:500 4cqw/1 var(--mono);letter-spacing:.16em;color:var(--card-ink);
+  text-shadow:-.07cqw -.09cqw 0 rgba(255,255,255,.38), .11cqw .15cqw 0 rgba(0,0,0,.75);
+}
+.mark{position:absolute;right:6.2cqw;bottom:5.4cqw;width:15.5cqw;height:auto;overflow:visible}
+
+@media (hover:hover){
+  .js .card:hover .press{transform:translateZ(14px)}
+  .js .card.down:hover .press{transform:translateZ(-38px)}
+}
+
+/* ── THE READER: hint, then the six records ───────────────────────────── */
+.reader{position:relative;z-index:1;margin-top:30px}
+.hint{
+  display:none;position:absolute;left:0;right:0;top:0;height:56px;margin:0;
+  align-items:center;justify-content:center;gap:10px;
+  font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);
+  transition:opacity var(--t-state) var(--e-state),visibility 0s linear var(--t-state);
+}
+.hint svg{width:14px;height:14px}
+.js .hint{display:flex}
+.is-read .hint{opacity:0;visibility:hidden}
+
+.records{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.records li{display:block}
+.rec{
+  /* earlier records sit on top, so each new one slides out from under the last */
+  position:relative;z-index:calc(10 - var(--i,0));
+  display:grid;grid-template-columns:2.2em minmax(0,1fr) auto 16px;align-items:center;column-gap:12px;
+  min-height:56px;padding:0 16px;border-radius:var(--r-page);
+  background:var(--slab);color:var(--ink);text-decoration:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  -webkit-tap-highlight-color:transparent;
+}
+.n{font:500 11px/1 var(--mono);letter-spacing:.06em;color:var(--mute);transition:color var(--t-state) var(--e-state)}
+.l{font:500 17px/1.25 var(--sans);letter-spacing:-.005em}
+.s{font:400 12px/1 var(--mono);color:var(--mute);white-space:nowrap}
+.ar{width:16px;height:16px;color:var(--mute);transition:transform var(--t-state) var(--e-state),color var(--t-state) var(--e-state)}
+.rec:focus-visible{outline:2px solid var(--volt);outline-offset:-2px}
+.rec:focus-visible .n,.rec:focus-visible .ar{color:var(--volt)}
+.rec:active{background:var(--slab-down)}
+@media (hover:hover){
+  .rec:hover{background:var(--slab-hi)}
+  .rec:hover .n,.rec:hover .ar{color:var(--volt)}
+  .rec:hover .ar{transform:translate(2px,-2px)}
+}
+
+/* enhanced: records live inside the card until it is read */
+.js:not(.is-read) .rec{visibility:hidden;transform:translateY(var(--from,-180px)) scale(.92)}
+.anim.is-read:not(.settled) .rec{
+  transition:
+    transform var(--t-travel) var(--e-travel) calc(var(--deal) + var(--i) * var(--step)),
+    visibility 0s linear calc(var(--deal) + var(--i) * var(--step));
+}
+.settled .rec{transition:background-color var(--t-state) var(--e-state),transform var(--t-state) var(--e-state)}
+.settled .rec:active{transform:translateY(1px)}
+
+/* ── reduced motion: nothing travels, the links are simply there ── */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:0s!important;animation:none!important}
+  .js .rec{visibility:visible!important;transform:none!important}
+  .js .hint{display:none}
+  .pose{transform:none}
+}
+
+/* ── wider screens: name left, card right ── */
+@media (min-width:880px){
+  .page{
+    max-width:1160px;display:grid;grid-template-columns:minmax(0,1fr) 440px;column-gap:72px;align-items:start;
+    padding:clamp(56px,13vh,140px) 56px 64px;
+  }
+  .intro{padding-top:8px}
+  .meta{justify-content:flex-start;gap:28px}
+  h1{margin-top:30px;font-size:clamp(64px,6.6vw,92px);line-height:.95}
+  .bio{margin-top:22px;font-size:17px}
+  .stage{margin-top:0}
+  .card{max-width:440px}
+  .reader{margin-top:34px}
+  .rec{min-height:52px}
+}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<main class="page">
+  <header class="intro">
+    <p class="meta"><span>Aufan Studio</span><span>Melbourne</span></p>
+    <h1>Aufan Rachmad</h1>
+    <p class="bio">Websites, systems and short motion films, built by hand. Data Science @ UniMelb.</p>
+  </header>
+
+  <div class="stage">
+    <div class="card" id="card" role="img" aria-label="Aufan Studio card">
+      <span class="shadow"></span>
+      <span class="tilt"><span class="pose"><span class="press"><span class="body">
+        <span class="edge e3"></span><span class="edge e2"></span><span class="edge e1"></span>
+        <span class="face">
+          <span class="issuer">aufan studio</span>
+          <span class="chip">
+            <span class="pad" style="grid-area:p0;--i:0"></span>
+            <span class="pad" style="grid-area:p1;--i:1"></span>
+            <span class="pad" style="grid-area:p2;--i:2"></span>
+            <span class="pc"></span>
+            <span class="pad" style="grid-area:p3;--i:3"></span>
+            <span class="pad" style="grid-area:p4;--i:4"></span>
+            <span class="pad" style="grid-area:p5;--i:5"></span>
+          </span>
+          <svg class="arcs" viewBox="0 0 20 25" aria-hidden="true">
+            <circle cx="3" cy="12.5" r="1.7" style="--d:0ms"/>
+            <path d="M7 8.2a6 6 0 0 1 0 8.6" style="--d:60ms"/>
+            <path d="M10.6 5a10.4 10.4 0 0 1 0 15" style="--d:130ms"/>
+            <path d="M14.2 1.8a14.8 14.8 0 0 1 0 21.4" style="--d:200ms"/>
+          </svg>
+          <span class="url" id="url">aufanhakim1920-source.github.io</span>
+          <span class="holder">AUFAN RACHMAD</span>
+          <svg class="mark" viewBox="14 16 172 116" aria-hidden="true">
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="13.5">
+              <path d="M42.5 122.5 100 25l57.5 97.5" stroke="rgba(0,0,0,.7)" transform="translate(2 2.6)"/>
+              <path d="M42.5 122.5 100 25l57.5 97.5" stroke="rgba(255,255,255,.4)" transform="translate(-1.4 -1.7)"/>
+              <path d="M42.5 122.5 100 25l57.5 97.5" stroke="#4F4880"/>
+            </g>
+            <path d="M22.5 95 177.5 70" stroke="#8C6BFF" stroke-width="14" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </span></span></span></span>
+    </div>
+
+    <nav class="reader" aria-label="Links">
+      <p class="hint" aria-hidden="true">
+        <svg viewBox="0 0 20 25" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="3" cy="12.5" r="1.7" fill="currentColor" stroke="none"/><path d="M7 8.2a6 6 0 0 1 0 8.6M10.6 5a10.4 10.4 0 0 1 0 15M14.2 1.8a14.8 14.8 0 0 1 0 21.4"/></svg>
+        Tap the card
+      </p>
+      <ol class="records" id="records">
+        <li><a class="rec" style="--i:0" rel="me" href="https://www.instagram.com/aufanstudio/" data-show="instagram.com/aufanstudio"><span class="n">01</span><span class="l">Instagram</span><span class="s">@aufanstudio</span><svg class="ar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a></li>
+        <li><a class="rec" style="--i:1" rel="me" href="https://www.youtube.com/@aufanstudio" data-show="youtube.com/@aufanstudio"><span class="n">02</span><span class="l">YouTube</span><span class="s">@aufanstudio</span><svg class="ar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a></li>
+        <li><a class="rec" style="--i:2" href="https://aufanhakim1920-source.github.io/studio/work/motion-night/" data-show="github.io/studio/work/motion-night"><span class="n">03</span><span class="l">The films</span><span class="s"></span><svg class="ar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a></li>
+        <li><a class="rec" style="--i:3" href="https://aufanhakim1920-source.github.io/studio/work/portfolio/" data-show="github.io/studio/work/portfolio"><span class="n">04</span><span class="l">Work with me</span><span class="s"></span><svg class="ar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a></li>
+        <li><a class="rec" style="--i:4" href="https://aufanhakim1920-source.github.io/studio/" data-show="aufanhakim1920-source.github.io/studio"><span class="n">05</span><span class="l">Everything I have built</span><span class="s"></span><svg class="ar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a></li>
+        <li><a class="rec" style="--i:5" rel="me" href="https://github.com/aufanhakim1920-source" data-show="github.com/aufanhakim1920-source"><span class="n">06</span><span class="l">GitHub</span><span class="s"></span><svg class="ar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg></a></li>
+      </ol>
+    </nav>
+  </div>
+</main>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  try {
+    var card = document.getElementById('card');
+    var urlEl = document.getElementById('url');
+    var pads = card.querySelectorAll('.pad');
+    var recs = Array.prototype.slice.call(document.querySelectorAll('.rec'));
+    var DEFAULT = urlEl.textContent;
+    var rm = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    var read = false, pingT = 0;
+
+    /* upgrade: the picture of a card becomes the control */
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-controls', 'records');
+    card.setAttribute('aria-expanded', 'false');
+    card.setAttribute('aria-label', 'Tap Aufan’s card to read six links');
+
+    /* each record starts tucked behind the card's centre */
+    function measure() {
+      var c = card.getBoundingClientRect();
+      var cy = c.top + c.height / 2;
+      recs.forEach(function (a) {
+        var r = a.parentNode.getBoundingClientRect();
+        a.style.setProperty('--from', (cy - (r.top + r.height / 2)).toFixed(1) + 'px');
+      });
+    }
+
+    function ping() {
+      root.classList.remove('ping');
+      void root.offsetWidth;
+      root.classList.add('ping');
+      clearTimeout(pingT);
+      pingT = setTimeout(function () { root.classList.remove('ping'); }, 800);
+    }
+
+    function doRead(animate) {
+      if (read) { if (animate) ping(); return; }
+      read = true;
+      if (animate) {
+        measure();
+        void root.offsetWidth;
+        root.classList.add('anim');
+      }
+      root.classList.add('is-read');
+      card.setAttribute('aria-expanded', 'true');
+      card.setAttribute('aria-label', 'Aufan’s card, read: six links below');
+      try { sessionStorage.setItem('aufan-card', '1'); } catch (e) {}
+      var settle = function () { root.classList.add('settled'); root.classList.remove('anim'); };
+      if (animate) setTimeout(settle, 1300); else settle();
+    }
+
+    /* the tap: press in, spring out, read */
+    function down() { card.classList.add('down'); }
+    function up() { card.classList.remove('down'); }
+    card.addEventListener('pointerdown', function (e) { if (e.button === 0) down(); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { card.addEventListener(t, up); });
+    card.addEventListener('click', function () { doRead(!rm.matches); });
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); doRead(!rm.matches); }
+      else if (e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); down(); }
+    });
+    card.addEventListener('keyup', function (e) {
+      if (e.key === ' ' || e.key === 'Spacebar') { up(); doRead(!rm.matches); }
+    });
+
+    /* scrolling toward the links reads the card too: nobody gets stuck */
+    window.addEventListener('scroll', function () {
+      if (!read && window.scrollY > 24) doRead(!rm.matches);
+    }, { passive: true });
+
+    /* pointer tilt + moving light (mouse only) */
+    var raf = 0, px = 0, py = 0;
+    card.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse' || !fine.matches || rm.matches) return;
+      var r = card.getBoundingClientRect();
+      px = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+      py = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+      if (!raf) raf = requestAnimationFrame(function () {
+        raf = 0;
+        card.style.setProperty('--ty', (px * 10).toFixed(2) + 'deg');
+        card.style.setProperty('--tx', (-py * 10).toFixed(2) + 'deg');
+        card.style.setProperty('--mx', (50 + px * 40).toFixed(1) + '%');
+        card.style.setProperty('--my', (50 + py * 45).toFixed(1) + '%');
+      });
+    });
+    card.addEventListener('pointerleave', function () {
+      ['--tx', '--ty', '--mx', '--my'].forEach(function (p) { card.style.removeProperty(p); });
+    });
+
+    /* pointing at a record lights its pad and prints its address on the card */
+    function show(i) {
+      for (var k = 0; k < pads.length; k++) pads[k].classList.toggle('on', +pads[k].style.getPropertyValue('--i') === i);
+      var t = i < 0 ? DEFAULT : recs[i].getAttribute('data-show');
+      if (urlEl.textContent !== t) {
+        urlEl.textContent = t;
+        urlEl.classList.remove('tick');
+        void urlEl.offsetWidth;
+        urlEl.classList.add('tick');
+      }
+    }
+    recs.forEach(function (a, i) {
+      a.addEventListener('pointerenter', function () { show(i); });
+      a.addEventListener('pointerleave', function () { show(document.activeElement && recs.indexOf(document.activeElement) > -1 ? recs.indexOf(document.activeElement) : -1); });
+      a.addEventListener('focus', function () { show(i); });
+      a.addEventListener('blur', function () { show(-1); });
+    });
+
+    /* already read this visit, or reduced motion: links are just there */
+    var seen = false;
+    try { seen = sessionStorage.getItem('aufan-card') === '1'; } catch (e) {}
+    if (seen || rm.matches) doRead(false);
+  } catch (err) {
+    /* anything breaks: fall back to the plain list */
+    root.classList.remove('js', 'is-read', 'anim');
+  }
+})();
+</script>
+</body>
+</html>

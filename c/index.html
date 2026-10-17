@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aufan Rachmad · Aufan Studio</title>
+<meta name="description" content="Websites, systems and short motion films, built by hand. Data Science @ UniMelb. Melbourne.">
+<meta name="theme-color" content="#F2DC1A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aufan Rachmad · Aufan Studio">
+<meta property="og:description" content="Websites, systems and short motion films, built by hand. Data Science @ UniMelb.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500..650&amp;family=Fraunces:opsz,wght@144,340&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,144,400&amp;text=take%20one&amp;display=swap">
+<style>
+/* ── VERSION C · the tear-off flyer ─────────────────────────────────────────
+   The page IS a photocopied flyer on copy-shop lemon paper. The six links are
+   its tear-off tabs. Tap a tab: it rips along the perforation and comes up into
+   your hand, turned so you can read the address. Tap the slip to go, or put it
+   back and it is taped on — so the fringe remembers what you took.
+   Palette: one saturated ground, near-black and near-white content only.
+   Radius: a committed zero (cut paper). */
+:root{
+  --paper:#F2DC1A;      /* copy-shop lemon, the ground            toner on it 13.1:1 */
+  --toner:#16150F;      /* photocopy black, all text on paper                          */
+  --board:#121211;      /* what shows through the cuts                                 */
+  --white:#F4F4EE;      /* near-white: tape, and text on toner / board / dim only     */
+  --radius-none:0;      /* cut paper: no corner is rounded, anywhere                   */
+  --t-state:.15s;
+  --ease-travel:cubic-bezier(.2,.85,.25,1);
+  --tab-h:clamp(216px,31svh,300px);
+  --gap:3px;
+  --grain:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .09 0 0 0 0 .08 0 0 0 0 .05 0 0 0 11 -7.6'/%3E%3C/filter%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .09 0 0 0 0 .04 0.8 0 0 0 -.38'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html{background:var(--board);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html.is-holding{overflow:hidden}
+body{margin:0;color:var(--toner);font-family:"Bricolage Grotesque",system-ui,sans-serif}
+
+/* ── the sheet ─────────────────────────────────────────────────────────── */
+.flyer{
+  position:relative;overflow:hidden;
+  min-height:calc(100svh - 22px);
+  display:flex;flex-direction:column;
+  background:var(--grain),var(--paper);
+  border-radius:var(--radius-none);
+  box-shadow:inset 0 0 90px rgba(22,21,15,.10); /* copier-lid edge, very faint */
+}
+.tape{position:absolute;top:-9px;width:86px;height:28px;background:rgba(244,244,238,.8);
+  box-shadow:0 1px 0 rgba(22,21,15,.10);pointer-events:none;
+  clip-path:polygon(0 8%,6% 0,12% 10%,18% 2%,82% 2%,88% 9%,94% 0,100% 7%,100% 92%,94% 100%,88% 91%,82% 99%,18% 99%,12% 90%,6% 100%,0 93%)}
+.tape--l{left:14px;transform:rotate(-7deg)}
+.tape--r{right:14px;transform:rotate(6deg)}
+
+.head{padding:38px 20px 0}
+.kicker{display:flex;justify-content:space-between;gap:12px;margin:0;padding-bottom:11px;
+  border-bottom:1.5px solid var(--toner);
+  font-weight:650;font-size:12px;line-height:1;letter-spacing:.14em;text-transform:uppercase}
+.name{margin:22px 0 0;font-family:Fraunces,Georgia,serif;font-weight:340;
+  font-size:clamp(64px,min(24vw,13.5svh),150px);line-height:.86;letter-spacing:-.028em}
+.name span{display:block}
+.line{margin:20px 0 0;max-width:27ch;font-size:18px;line-height:1.36;font-weight:500;text-wrap:pretty}
+
+/* ── the fringe of tabs ────────────────────────────────────────────────── */
+.pull{margin-top:auto;padding-top:28px}
+.take{display:flex;align-items:flex-end;gap:6px;margin:0 0 8px;padding:0 20px;
+  font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:400;font-size:22px;line-height:1}
+.take svg{width:44px;height:40px;flex:none;margin-bottom:-6px}
+.fringe{position:relative}
+.fringe::before{ /* the perforation */
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:4;pointer-events:none;
+  background:repeating-linear-gradient(90deg,var(--toner) 0 5px,transparent 5px 9px)}
+.fringe ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,1fr);
+  gap:var(--gap);background:var(--board)}
+.slot{position:relative;background:var(--board)}
+.slot::before{ /* the stub left on the sheet once a tab is torn */
+  content:"";position:absolute;left:0;right:0;top:0;height:17px;visibility:hidden;
+  background:var(--grain),var(--paper);
+  clip-path:polygon(0 0,100% 0,100% 11px,88% 14px,76% 9px,63% 13px,50% 10px,38% 15px,25% 10px,12% 13px,0 10px)}
+.slot.is-torn::before{visibility:visible}
+.slot.is-taped::after{ /* tape across the seam */
+  content:"";position:absolute;left:4px;right:4px;top:3px;height:20px;z-index:3;pointer-events:none;
+  background:rgba(244,244,238,.84);box-shadow:0 1px 0 rgba(22,21,15,.12);transform:rotate(-5deg)}
+.slot.is-slap::after{animation:slap .32s var(--ease-travel)}
+@keyframes slap{from{transform:rotate(-5deg) scale(1.3);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+
+.tab{position:relative;display:flex;align-items:stretch;justify-content:center;
+  height:var(--tab-h);padding:12px 0;
+  background:var(--grain),var(--paper);color:var(--toner);text-decoration:none;
+  border-radius:var(--radius-none);
+  transform-origin:50% 0;transition:transform var(--t-state) ease-out;
+  -webkit-tap-highlight-color:transparent;outline:none}
+.tab:focus-visible{box-shadow:inset 0 0 0 3px var(--toner)}
+.tab:active{transform:translateY(5px)}
+@media (hover:hover){ .tab:hover{transform:rotate(1.6deg)} .tab:active{transform:translateY(5px)} }
+.slot.is-out .tab{visibility:hidden}
+.slot.is-taped .tab{clip-path:polygon(0 13px,12% 16px,25% 12px,38% 17px,50% 12px,63% 15px,76% 11px,88% 16px,100% 13px,100% 100%,0 100%)}
+.ink{writing-mode:vertical-rl;transform:rotate(180deg);height:100%;text-align:start}
+.ink b{display:block;font-weight:650;font-size:15px;line-height:1.12;letter-spacing:-.005em}
+.ink small{display:block;margin-block-start:5px;font-weight:500;font-size:11px;line-height:1.2}
+
+.board{height:22px;background:var(--board)}
+
+/* ── the slip in your hand ─────────────────────────────────────────────── */
+.hand{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px}
+.hand[hidden]{display:none}
+.dim{position:absolute;inset:0;background:rgba(18,18,17,.88);opacity:0;transition:opacity var(--t-state) ease-out}
+.hand.is-open .dim{opacity:1}
+.slipwrap{position:relative;width:min(88vw,460px);transform:rotate(-2deg);filter:drop-shadow(0 18px 22px rgba(0,0,0,.5))}
+.slip{display:block;padding:24px 42px 22px 24px;background:var(--grain),var(--paper);color:var(--toner);
+  text-decoration:none;outline:none;border-radius:var(--radius-none);
+  /* the right edge is the perforation it was torn along */
+  clip-path:polygon(0 0,calc(100% - 13px) 0,calc(100% - 5px) 7%,calc(100% - 12px) 15%,calc(100% - 3px) 24%,calc(100% - 10px) 33%,calc(100% - 4px) 43%,calc(100% - 13px) 52%,calc(100% - 5px) 61%,calc(100% - 11px) 71%,calc(100% - 3px) 80%,calc(100% - 10px) 90%,calc(100% - 6px) 100%,0 100%)}
+.slip-label{display:block;font-family:Fraunces,Georgia,serif;font-weight:340;font-size:44px;line-height:.95;letter-spacing:-.02em}
+.slip-note{display:block;margin-top:10px;font-weight:500;font-size:16px;line-height:1.3}
+.slip-addr{display:block;margin-top:16px;padding-top:12px;border-top:1.5px dashed var(--toner);
+  font-weight:500;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.slip-go{display:inline-flex;align-items:center;min-height:44px;margin-top:16px;padding:0 16px;
+  background:var(--toner);color:var(--white);font-weight:650;font-size:15px;line-height:1;transition:transform var(--t-state) ease-out}
+.slip:active .slip-go{transform:translateY(2px)}
+.slip:focus-visible .slip-go{box-shadow:0 0 0 3px var(--paper),0 0 0 6px var(--toner)}
+.putback{position:relative;min-height:44px;padding:0 22px;background:transparent;color:var(--white);
+  border:1.5px solid var(--white);border-radius:var(--radius-none);
+  font:600 15px/1 "Bricolage Grotesque",system-ui,sans-serif;cursor:pointer;
+  opacity:0;transition:opacity .1s,background-color var(--t-state),color var(--t-state)}
+.hand.is-open .putback{opacity:1;transition:opacity var(--t-state) ease-out .34s,background-color var(--t-state),color var(--t-state)}
+.putback:hover{background:var(--white);color:var(--toner)}
+.putback:focus-visible{outline:3px solid var(--white);outline-offset:4px}
+
+/* ── wider screens: the sheet gets bigger, the fringe keeps paper proportions ── */
+@media (min-width:760px){
+  :root{--tab-h:clamp(236px,32vh,300px);--gap:4px}
+  .head{width:100%;max-width:1180px;margin:0 auto;padding:60px 56px 0}
+  .kicker{font-size:13px}
+  .line{font-size:21px;margin-top:26px}
+  .pull{width:100%;max-width:1180px;margin-left:auto;margin-right:auto;padding:40px 56px 0}
+  .fringe{max-width:800px}
+  .take{padding:0;font-size:24px}
+  .fringe ul{border-left:var(--gap) solid var(--board);border-right:var(--gap) solid var(--board)}
+  .ink b{font-size:18px}
+  .ink small{font-size:12px}
+  .tab{padding:16px 0}
+  .board{height:36px}
+  .flyer{min-height:calc(100svh - 36px)}
+  .tape{width:120px;height:32px}
+  .tape--l{left:48px}.tape--r{right:48px}
+}
+@media (min-width:1000px){
+  .name{font-size:clamp(120px,11.4vw,172px);white-space:nowrap}
+  .name span{display:inline}
+}
+@media (prefers-reduced-motion:reduce){
+  .tab,.dim,.slip-go,.putback,.hand.is-open .putback{transition:none}
+  .tab:hover,.tab:active{transform:none}
+  .slot.is-slap::after{animation:none}
+}
+</style>
+</head>
+<body>
+<main class="flyer">
+  <div class="tape tape--l" aria-hidden="true"></div>
+  <div class="tape tape--r" aria-hidden="true"></div>
+
+  <header class="head">
+    <p class="kicker"><span>Aufan Studio</span><span>Melbourne</span></p>
+    <h1 class="name"><span>Aufan</span> <span>Rachmad</span></h1>
+    <p class="line">Websites, systems and short motion films, built by hand. Data Science @ UniMelb.</p>
+  </header>
+
+  <section class="pull" aria-label="Links">
+    <p class="take" aria-hidden="true">take one
+      <svg viewBox="0 0 44 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9c11-6 24-4 29 6 3 6 2 13-1 20"/><path d="M24 29l7 7 6-9"/></svg>
+    </p>
+    <nav class="fringe">
+      <ul>
+        <li class="slot"><a class="tab" href="https://www.instagram.com/aufanstudio/" data-note="@aufanstudio · the films live here"><span class="ink"><b>Instagram</b><small>@aufanstudio</small></span></a></li>
+        <li class="slot"><a class="tab" href="https://www.youtube.com/@aufanstudio" data-note="@aufanstudio"><span class="ink"><b>YouTube</b><small>@aufanstudio</small></span></a></li>
+        <li class="slot"><a class="tab" href="https://aufanhakim1920-source.github.io/studio/work/motion-night/" data-note="Motion Night · the failed ones kept too"><span class="ink"><b>The films</b><small>Motion Night</small></span></a></li>
+        <li class="slot"><a class="tab" href="https://aufanhakim1920-source.github.io/studio/work/portfolio/" data-note="Landing pages, websites, working systems"><span class="ink"><b>Work with me</b><small>websites &amp; systems</small></span></a></li>
+        <li class="slot"><a class="tab" href="https://aufanhakim1920-source.github.io/studio/" data-note="The whole gallery · no template"><span class="ink"><b>Everything I have built</b><small>the gallery</small></span></a></li>
+        <li class="slot"><a class="tab" href="https://github.com/aufanhakim1920-source" data-note="aufanhakim1920-source"><span class="ink"><b>GitHub</b><small>the code</small></span></a></li>
+      </ul>
+    </nav>
+  </section>
+</main>
+<div class="board" aria-hidden="true"></div>
+
+<div class="hand" role="dialog" aria-modal="true" aria-label="The tab in your hand" hidden>
+  <div class="dim"></div>
+  <div class="slipwrap">
+    <a class="slip">
+      <span class="slip-label"></span>
+      <span class="slip-note"></span>
+      <span class="slip-addr"></span>
+      <span class="slip-go">Open &#8599;</span>
+    </a>
+  </div>
+  <button class="putback" type="button">Put it back</button>
+</div>
+
+<script>
+(() => {
+  const html = document.documentElement;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+  const slots = [...document.querySelectorAll(".slot")];
+  const hand = document.querySelector(".hand");
+  const wrap = hand.querySelector(".slipwrap");
+  const slip = hand.querySelector(".slip");
+  const back = hand.querySelector(".putback");
+  const dim = hand.querySelector(".dim");
+  const out = { label: hand.querySelector(".slip-label"), note: hand.querySelector(".slip-note"), addr: hand.querySelector(".slip-addr") };
+  const KEY = "aufan-flyer-taken";
+  let taken = new Set();
+  try { taken = new Set(JSON.parse(sessionStorage.getItem(KEY) || "[]")); } catch (e) {}
+  const save = () => { try { sessionStorage.setItem(KEY, JSON.stringify([...taken])); } catch (e) {} };
+  slots.forEach((s, i) => { if (taken.has(i)) s.classList.add("is-torn", "is-taped"); });
+
+  let cur = -1, busy = false;
+  const plain = (e) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+  const centre = (r) => [r.left + r.width / 2, r.top + r.height / 2];
+
+  // where the slip sits when it is still the tab: rotated back to vertical, tab-sized
+  function tabPose(tab) {
+    const [tx, ty] = centre(tab.getBoundingClientRect());
+    const [fx, fy] = centre(wrap.getBoundingClientRect());
+    const k = tab.offsetHeight / wrap.offsetWidth;
+    return `translate(${tx - fx}px, ${ty - fy}px) rotate(-90deg) scale(${k})`;
+  }
+
+  function open(i) {
+    const slot = slots[i], tab = slot.querySelector(".tab");
+    const href = tab.getAttribute("href");
+    cur = i; busy = true;
+    slip.setAttribute("href", href);
+    out.label.textContent = tab.querySelector("b").textContent;
+    out.note.textContent = tab.dataset.note;
+    out.addr.textContent = href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+    hand.hidden = false;
+    html.classList.add("is-holding");
+    wrap.style.visibility = "hidden";
+    const from = tabPose(tab);
+    void hand.offsetWidth;
+    hand.classList.add("is-open");
+    slot.classList.add("is-torn");
+    const done = () => { busy = false; slip.focus({ preventScroll: true }); };
+    if (reduce.matches) {
+      slot.classList.add("is-out"); slot.classList.remove("is-taped");
+      wrap.style.visibility = ""; done(); return;
+    }
+    // the rip: a short pull down the perforation, then it comes away
+    tab.animate([{ transform: "none" }, { transform: "translateY(9px) rotate(3deg)" }], { duration: 110, easing: "ease-in" })
+      .finished.then(() => {
+        slot.classList.add("is-out"); slot.classList.remove("is-taped");
+        wrap.style.visibility = "";
+        return wrap.animate([{ transform: from }, { transform: "rotate(-2deg)" }], { duration: 540, easing: "cubic-bezier(.2,.85,.25,1)" }).finished;
+      })
+      .then(done, done);
+  }
+
+  function close(instant) {
+    if (cur < 0) return;
+    const i = cur, slot = slots[i], tab = slot.querySelector(".tab");
+    busy = true;
+    const finish = () => {
+      hand.hidden = true; hand.classList.remove("is-open");
+      wrap.style.visibility = "";
+      html.classList.remove("is-holding");
+      slot.classList.remove("is-out");
+      slot.classList.add("is-taped");
+      taken.add(i); save();
+      if (!instant && !reduce.matches) {
+        slot.classList.add("is-slap");
+        setTimeout(() => slot.classList.remove("is-slap"), 360);
+      }
+      cur = -1; busy = false;
+      tab.focus({ preventScroll: true });
+    };
+    if (instant || reduce.matches) { finish(); return; }
+    const to = tabPose(tab);
+    hand.classList.remove("is-open");
+    wrap.animate([{ transform: "rotate(-2deg)" }, { transform: to }], { duration: 420, easing: "cubic-bezier(.45,0,.25,1)" })
+      .finished.then(() => { wrap.style.visibility = "hidden"; finish(); }, finish);
+  }
+
+  slots.forEach((slot, i) => {
+    slot.querySelector(".tab").addEventListener("click", (e) => {
+      if (!plain(e)) return;               // ctrl/cmd/middle click: let the browser open it
+      e.preventDefault();
+      if (busy || cur !== -1) return;
+      open(i);
+    });
+  });
+
+  slip.addEventListener("click", (e) => {
+    if (cur >= 0) { taken.add(cur); save(); }
+    if (!plain(e)) setTimeout(() => close(false), 60);   // opened in a new tab: you stay, it goes back on
+  });
+  back.addEventListener("click", () => { if (!busy) close(false); });
+  dim.addEventListener("click", () => { if (!busy) close(false); });
+  hand.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { e.preventDefault(); if (!busy) close(false); }
+    else if (e.key === "Tab") {
+      e.preventDefault();
+      (document.activeElement === slip ? back : slip).focus();
+    }
+  });
+  addEventListener("pageshow", (e) => { if (e.persisted && cur >= 0) close(true); });
+  document.addEventListener("touchstart", () => {}, { passive: true }); // lets :active fire on iOS
+})();
+</script>
+</body>
+</html>

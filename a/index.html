@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aufan Rachmad · Aufan Studio</title>
+<meta name="description" content="Aufan Rachmad, Aufan Studio, Melbourne. Websites, systems and short motion films, built by hand. Data Science @ UniMelb.">
+<meta name="theme-color" content="#DAE7E3">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aufan Rachmad · Aufan Studio">
+<meta property="og:description" content="Websites, systems and short motion films, built by hand. Data Science @ UniMelb.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Ccircle%20cx='16'%20cy='16'%20r='15'%20fill='%23F2634C'/%3E%3Cpath%20d='M11%2021%2021%2011M13.5%2011H21v7.5'%20fill='none'%20stroke='%2312201D'%20stroke-width='2.4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&amp;family=Newsreader:ital,opsz,wght@0,72,300;1,72,300&amp;display=swap">
+<style>
+/* ── Aufan link stack · version A: chill and conventional ───────────────
+   Ground  ice-green #DAE7E3 → blue-grey #D2DEE2 (never cream, never pure white)
+   Ink     #12201D, soft ink #3E4E49
+   Signal  ONE coral #F2634C, used only as a fill (never as text)
+   Radius  two named tiers: --radius-edge 0 (the stack, its rules, focus ring)
+                            --radius-disc 50% (the one round thing: what you press)
+   Motion  0.15s, response to hover / focus / press only. Nothing ambient. */
+:root{
+  --ice:#DAE7E3;
+  --ice-deep:#D2DEE2;
+  --ink:#12201D;
+  --ink-soft:#3E4E49;
+  --coral:#F2634C;
+  --rule:rgba(18,32,29,.16);
+  --rule-disc:rgba(18,32,29,.38);
+
+  --radius-edge:0;
+  --radius-disc:50%;
+
+  --t:.15s;
+  --ease:cubic-bezier(.215,.61,.355,1); /* easeOutCubic, standard table */
+
+  --serif:"Newsreader","Iowan Old Style",Georgia,serif;
+  --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+
+  --gutter:max(20px,env(safe-area-inset-left),env(safe-area-inset-right));
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{
+  min-height:100%;
+  background-color:var(--ice);
+  background-image:linear-gradient(168deg,var(--ice) 0%,var(--ice) 42%,var(--ice-deep) 100%);
+  color:var(--ink);
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+body{
+  margin:0;
+  min-height:100%;
+  font:400 16px/1.45 var(--sans);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+::selection{background:var(--coral);color:var(--ink)}
+
+/* Texture layer: static film grain, above everything, never catches a tap. */
+.grain{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .07 0 0 0 0 .125 0 0 0 0 .114 0 0 0 .2 -.08'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+}
+
+/* ── Page ─────────────────────────────────────────────────────────────── */
+.page{
+  min-height:100vh;
+  min-height:100svh;
+  padding:
+    max(18px,env(safe-area-inset-top))
+    var(--gutter)
+    max(36px,env(safe-area-inset-bottom));
+}
+
+.bar{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  margin:0 0 44px;
+  font:500 12px/1 var(--sans);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+
+.name{
+  margin:0 0 18px;
+  font:300 clamp(56px,19vw,76px)/.9 var(--serif);
+  letter-spacing:-.025em;
+}
+.name span,
+.name em{display:block}
+.name em{font-style:italic;padding-left:.5em}
+
+.bio{
+  margin:0;
+  max-width:31ch;
+}
+.bio span{display:block;color:var(--ink-soft)}
+
+/* ── The stack ────────────────────────────────────────────────────────── */
+.links{margin-top:40px}
+.group + .group{margin-top:28px}
+
+.group h2{
+  margin:0;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--ink);
+  font:500 12px/1 var(--sans);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.group ul{margin:0;padding:0;list-style:none}
+.group li{border-bottom:1px solid var(--rule)}
+
+.row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 40px;
+  align-items:center;
+  column-gap:16px;
+  min-height:66px;
+  padding:11px 0;
+  color:var(--ink);
+  text-decoration:none;
+  border-radius:var(--radius-edge);
+  -webkit-tap-highlight-color:transparent;
+}
+.text{display:block;min-width:0}
+.label{
+  display:block;
+  font:300 26px/1.1 var(--serif);
+  letter-spacing:-.01em;
+}
+.sub{
+  display:block;
+  margin-top:3px;
+  font-size:14px;
+  line-height:1.3;
+  color:var(--ink-soft);
+  overflow-wrap:anywhere;
+}
+.sep{margin:0 .15em}
+.disc{
+  display:grid;
+  place-items:center;
+  width:40px;
+  height:40px;
+  border:1px solid var(--rule-disc);
+  border-radius:var(--radius-disc);
+  color:var(--ink);
+}
+.disc svg{
+  width:16px;
+  height:16px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.6;
+}
+
+/* The lead: Instagram is why the card exists, so its disc is already lit. */
+.lead .disc{background:var(--coral);border-color:var(--coral)}
+
+/* Responses — every one caused by the visitor, all 0.15s. */
+.text,.sub,.disc,.disc svg,.group li{
+  transition:
+    transform var(--t) var(--ease),
+    color var(--t) var(--ease),
+    background-color var(--t) var(--ease),
+    border-color var(--t) var(--ease);
+}
+@media (hover:hover){
+  .group li:hover{border-bottom-color:var(--ink)}
+  .row:hover .text{transform:translateX(6px)}
+  .row:hover .sub{color:var(--ink)}
+  .row:hover .disc{background:var(--coral);border-color:var(--coral)}
+  .row:hover .disc svg{transform:translate(1.5px,-1.5px)}
+}
+.row:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+.row:focus-visible .text{transform:translateX(6px)}
+.row:focus-visible .disc{background:var(--coral);border-color:var(--coral)}
+/* Press: the disc inverts to ink and sinks — the last thing seen before the jump. */
+.row:active .disc{
+  background:var(--ink);
+  border-color:var(--ink);
+  color:var(--coral);
+  transform:scale(.88);
+}
+
+/* ── Wide screens: name holds the left, the stack holds the right ─────── */
+@media (min-width:900px){
+  .page{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,30rem);
+    grid-template-rows:auto 1fr;
+    column-gap:clamp(48px,8vw,136px);
+    padding:40px clamp(40px,6vw,96px) 64px;
+  }
+  .bar{grid-column:1 / -1;margin:0}
+  .id{align-self:end;padding-bottom:4px}
+  .links{align-self:end;margin-top:72px}
+  .name{font-size:clamp(76px,8.6vw,132px);margin-bottom:28px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .text,.sub,.disc,.disc svg,.group li{transition:none}
+  .row:hover .text,.row:hover .disc svg,
+  .row:focus-visible .text,
+  .row:active .disc{transform:none}
+}
+
+@media (forced-colors:active){
+  .disc{border-color:CanvasText}
+  .grain{display:none}
+}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<main class="page">
+  <p class="bar"><span>Aufan Studio</span><span>Melbourne</span></p>
+
+  <div class="id">
+    <h1 class="name"><span>Aufan</span> <em>Rachmad</em></h1>
+    <p class="bio">Websites, systems and short motion films, built by hand. <span>Data Science @ UniMelb.</span></p>
+  </div>
+
+  <nav class="links" aria-label="Links">
+    <section class="group" aria-labelledby="g-watch">
+      <h2 id="g-watch">Watch</h2>
+      <ul>
+        <li><a class="row lead" href="https://www.instagram.com/aufanstudio/" rel="me">
+          <span class="text"><span class="label">Instagram</span> <span class="sub">@aufanstudio <span class="sep" aria-hidden="true">·</span> the films live here</span></span>
+          <span class="disc" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span>
+        </a></li>
+        <li><a class="row" href="https://www.youtube.com/@aufanstudio" rel="me">
+          <span class="text"><span class="label">YouTube</span> <span class="sub">@aufanstudio</span></span>
+          <span class="disc" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span>
+        </a></li>
+        <li><a class="row" href="https://aufanhakim1920-source.github.io/studio/work/motion-night/">
+          <span class="text"><span class="label">The films</span></span>
+          <span class="disc" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span>
+        </a></li>
+      </ul>
+    </section>
+
+    <section class="group" aria-labelledby="g-build">
+      <h2 id="g-build">Build</h2>
+      <ul>
+        <li><a class="row" href="https://aufanhakim1920-source.github.io/studio/work/portfolio/">
+          <span class="text"><span class="label">Work with me</span></span>
+          <span class="disc" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span>
+        </a></li>
+        <li><a class="row" href="https://aufanhakim1920-source.github.io/studio/">
+          <span class="text"><span class="label">Everything I have built</span></span>
+          <span class="disc" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span>
+        </a></li>
+        <li><a class="row" href="https://github.com/aufanhakim1920-source" rel="me">
+          <span class="text"><span class="label">GitHub</span> <span class="sub">aufanhakim1920-source</span></span>
+          <span class="disc" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span>
+        </a></li>
+      </ul>
+    </section>
+  </nav>
+</main>
+</body>
+</html>
