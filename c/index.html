@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,144,400&amp;text=take%20one&amp;display=swap">
 <style>
 /* ── VERSION C · the tear-off flyer ─────────────────────────────────────────
-   The page IS a photocopied flyer on copy-shop lemon paper. The six links are
+   The page IS a photocopied flyer on copy-shop lemon paper. The seven links are
    its tear-off tabs. Tap a tab: it rips along the perforation and comes up into
    your hand, turned so you can read the address. Tap the slip to go, or put it
    back and it is taped on — so the fringe remembers what you took.
@@ -72,7 +72,7 @@ body{margin:0;color:var(--toner);font-family:"Bricolage Grotesque",system-ui,san
 .fringe::before{ /* the perforation */
   content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:4;pointer-events:none;
   background:repeating-linear-gradient(90deg,var(--toner) 0 5px,transparent 5px 9px)}
-.fringe ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,1fr);
+.fringe ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,1fr);
   gap:var(--gap);background:var(--board)}
 .slot{position:relative;background:var(--board)}
 .slot::before{ /* the stub left on the sheet once a tab is torn */
@@ -176,6 +176,7 @@ body{margin:0;color:var(--toner);font-family:"Bricolage Grotesque",system-ui,san
     <nav class="fringe">
       <ul>
         <li class="slot"><a class="tab" href="https://www.instagram.com/aufanstudio/" data-note="@aufanstudio · the films live here"><span class="ink"><b>Instagram</b><small>@aufanstudio</small></span></a></li>
+        <li class="slot"><a class="tab" href="https://www.instagram.com/aufan_mrpiggi/" data-note="@aufan_mrpiggi · my own page"><span class="ink"><b>Instagram</b><small>@aufan_mrpiggi</small></span></a></li>
         <li class="slot"><a class="tab" href="https://www.youtube.com/@aufanstudio" data-note="@aufanstudio"><span class="ink"><b>YouTube</b><small>@aufanstudio</small></span></a></li>
         <li class="slot"><a class="tab" href="https://aufanhakim1920-source.github.io/studio/work/motion-night/" data-note="Motion Night · the failed ones kept too"><span class="ink"><b>The films</b><small>Motion Night</small></span></a></li>
         <li class="slot"><a class="tab" href="https://aufanhakim1920-source.github.io/studio/work/portfolio/" data-note="Landing pages, websites, working systems"><span class="ink"><b>Work with me</b><small>websites &amp; systems</small></span></a></li>
